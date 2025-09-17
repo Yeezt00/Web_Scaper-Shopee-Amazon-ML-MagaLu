@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProScraper Pro v8.1 - Sistema Semi-Automático</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #252525;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --accent-primary: #00d4ff;
+      --accent-secondary: #ff6b6b;
+      --accent-success: #00ff88;
+      --accent-warning: #ffaa00;
+      --border: #2a2a2a;
+      --shadow: rgba(0, 212, 255, 0.1);
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+    
+    .version-badge {
+      display: inline-block;
+      background: var(--accent-success);
+      color: var(--bg-primary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+    
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 968px) {
+      .main-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 2rem; }
+    }
+    
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .section-title {
+      font-size: 1.2rem;
+      color: var(--accent-primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--shadow);
+    }
+    
+    .url-input-group {
+      position: relative;
+    }
+    
+    .url-input-group input {
+      padding-right: 50px;
+    }
+    
+    .url-status {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary), #0099cc);
+      color: white;
+      width: 100%;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .operation-mode {
+      display: none !important;
+    }
+    
+    .operation-mode.active {
+      display: block !important;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 25px;
+      background: var(--bg-tertiary);
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .toggle-switch.active {
+      background: var(--accent-primary);
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      width: 21px;
+      height: 21px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s ease;
+    }
+    
+    .toggle-switch.active .toggle-slider {
+      transform: translateX(25px);
+    }
+    
+    .product-preview {
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+      display: none;
+    }
+    
+    .product-info {
+      display: flex;
+      gap: 1.5rem;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+    
+    .product-image {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .product-details {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .product-details h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .price-info {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin: 0.5rem 0;
+      flex-wrap: wrap;
+    }
+    
+    .price-original {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .price-current {
+      color: var(--accent-success);
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    
+    .discount-badge {
+      background: var(--accent-secondary);
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .status-bar {
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-success);
+      animation: blink 1s ease-in-out infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    .loader {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--bg-tertiary);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 2rem auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .message-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .message-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn-small {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-copy {
+      background: var(--bg-tertiary);
+      color: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+    }
+    
+    .btn-copy:hover {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+    
+    .btn-edit {
+      background: var(--bg-tertiary);
+      color: var(--accent-warning);
+      border: 1px solid var(--accent-warning);
+    }
+    
+    .btn-edit:hover {
+      background: var(--accent-warning);
+      color: var(--bg-primary);
+    }
+    
+    .btn-save {
+      background: var(--accent-success);
+      color: var(--bg-primary);
+    }
+    
+    .btn-save:hover {
+      background: #00cc6a;
+    }
+    
+    .message-text {
+      font-family: 'Consolas', 'Monaco', monospace;
+      white-space: pre-wrap;
+      color: var(--text-primary);
+      line-height: 1.8;
+      width: 100%;
+      min-height: 120px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      resize: vertical;
+      transition: all 0.3s ease;
+    }
+    
+    .message-text:focus {
+      outline: none;
+      border-color: var(--accent-warning);
+      box-shadow: 0 0 0 3px rgba(255, 170, 0, 0.1);
+    }
+    
+    .message-text[readonly] {
+      cursor: default;
+    }
+    
+    .message-text:not([readonly]) {
+      cursor: text;
+      background: #2a2a2a;
+      border-color: var(--accent-warning);
+    }
+    
+    .notification {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.success { background: var(--accent-success); }
+    .notification.error { background: var(--accent-secondary); }
+    .notification.info { background: var(--accent-primary); }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .stat-card {
+      background: var(--bg-tertiary);
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+    
+    .success-message {
+      background: var(--accent-success);
+      color: var(--bg-primary);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>ProScraper Pro</h1>
+      <p class="subtitle">Sistema Semi-Automático de Extração e Geração de Promoções</p>
+      <div class="version-badge">v8.1 - LIMPO E FUNCIONAL ✨</div>
+    </header>
+
+    <div class="main-grid">
+      <!-- PAINEL DE CONTROLE -->
+      <div class="card">
+        <h2 class="section-title">⚙️ Painel de Controle</h2>
+        
+        <!-- SELETOR DE MODO -->
+        <div class="form-group">
+          <label>Modo de Operação</label>
+          <select id="operationMode" onchange="switchMode()">
+            <option value="automatico">🤖 Automático (Extrair URL)</option>
+            <option value="semi-manual">📝 Semi-Manual (Dados Manuais)</option>
+            <option value="json-direto">📋 JSON Direto (Salvar Mensagem)</option>
+          </select>
+          <small style="color: var(--text-secondary); margin-top: 0.5rem; display: block;">
+            💡 Teste: Mude a opção acima para ver os campos aparecerem
+          </small>
+        </div>
+
+        <!-- MODO AUTOMÁTICO -->
+        <div id="modeAutomatico" class="operation-mode active">
+          <div class="form-group">
+            <label>URL do Produto</label>
+            <div class="url-input-group">
+              <input type="url" id="productUrl" placeholder="Cole a URL do produto">
+              <span class="url-status" id="urlStatus"></span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-icon" onclick="extractFromUrl()">
+            <span>🚀</span> Extrair Dados
+          </button>
+        </div>
+
+        <!-- MODO SEMI-MANUAL -->
+        <div id="modeSemiManual" class="operation-mode">
+          <div class="form-group">
+            <label>Nome do Produto *</label>
+            <input type="text" id="manualTitle" placeholder="Ex: Smartphone Samsung Galaxy" required>
+          </div>
+          <div class="form-group">
+            <label>Preço Atual *</label>
+            <input type="text" id="manualPrice" placeholder="Ex: R$ 1.299,90" required>
+          </div>
+          <div class="form-group">
+            <label>Preço Original (opcional)</label>
+            <input type="text" id="manualOriginalPrice" placeholder="Ex: R$ 1.599,90">
+          </div>
+          <div class="form-group">
+            <label>URL do Produto *</label>
+            <input type="url" id="manualUrl" placeholder="https://exemplo.com/produto" required>
+          </div>
+          <div class="form-group">
+            <label>URL da Imagem (opcional)</label>
+            <input type="url" id="manualImage" placeholder="https://exemplo.com/imagem.jpg">
+          </div>
+          <button class="btn btn-primary btn-icon" onclick="processManualData()">
+            <span>📝</span> Processar Dados
+          </button>
+        </div>
+
+        <!-- MODO JSON DIRETO -->
+        <div id="modeJsonDireto" class="operation-mode">
+          <div class="form-group">
+            <label>Mensagem Completa *</label>
+            <textarea id="jsonMessage" rows="6" placeholder="🔥 OFERTA IMPERDÍVEL!&#10;Produto XYZ&#10;💰 R$ 999,90&#10;🔗 https://exemplo.com" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>URL da Imagem (opcional)</label>
+            <input type="url" id="jsonImage" placeholder="https://exemplo.com/imagem.jpg">
+          </div>
+          <button class="btn btn-primary btn-icon" onclick="saveDirectly()">
+            <span>💾</span> Salvar no Supabase
+          </button>
+        </div>
+
+        <!-- CONFIGURAÇÕES -->
+        <div id="configurations">
+          <div class="form-group">
+            <label>Categoria</label>
+            <select id="category">
+              <option value="tecnologia">💻 Tecnologia</option>
+              <option value="casa">🏠 Casa</option>
+              <option value="saude">💪 Saúde</option>
+              <option value="moda">👗 Moda</option>
+              <option value="esporte">⚽ Esporte</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Tipo de Mensagem</label>
+            <select id="messageType">
+              <option value="impacto">🔥 Alto Impacto</option>
+              <option value="urgencia">⏰ Urgência</option>
+              <option value="beneficio">✨ Benefícios</option>
+              <option value="escassez">🚨 Escassez</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Configurações de Frete</label>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+              <span style="font-size: 0.9rem;">Incluir Frete Grátis</span>
+              <div class="toggle-switch" id="toggleFrete">
+                <div class="toggle-slider"></div>
+              </div>
+            </div>
+            <div id="freteConfig" style="display: none; margin-top: 1rem;">
+              <input type="text" id="freteMinimo" placeholder="Valor mínimo (ex: R$ 79,90)" style="margin-bottom: 0.5rem;">
+              <select id="freteCondicao">
+                <option value="geral">Frete Grátis</option>
+                <option value="minimo">Frete Grátis acima de X</option>
+                <option value="prime">Frete Grátis Prime/Full</option>
+                <option value="regiao">Frete Grátis para sua região</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Configurações de Cupom</label>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+              <span style="font-size: 0.9rem;">Incluir Cupom</span>
+              <div class="toggle-switch" id="toggleCupom">
+                <div class="toggle-slider"></div>
+              </div>
+            </div>
+            <div id="cupomConfig" style="display: none; margin-top: 1rem;">
+              <input type="text" id="cupomCodigo" placeholder="Código do cupom (ex: PROMO10)" style="margin-bottom: 0.5rem;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <input type="number" id="cupomValor" placeholder="Valor do desconto">
+                <select id="cupomTipo">
+                  <option value="porcentagem">% de desconto</option>
+                  <option value="reais">R$ de desconto</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Outras Configurações</label>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+              <span style="font-size: 0.9rem;">Incluir avaliações</span>
+              <div class="toggle-switch" id="toggleRatings">
+                <div class="toggle-slider"></div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+              <span style="font-size: 0.9rem;">Salvar no Supabase</span>
+              <div class="toggle-switch active" id="toggleSupabase">
+                <div class="toggle-slider"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-bar" id="statusBar">
+          <div class="status-indicator"></div>
+          <span id="statusText">Pronto</span>
+        </div>
+      </div>
+
+      <!-- ÁREA DE RESULTADOS -->
+      <div class="card">
+        <h2 class="section-title">📊 Resultados</h2>
+        
+        <div class="product-preview" id="productPreview">
+          <div class="product-info">
+            <img class="product-image" id="productImage" src="" alt="Produto">
+            <div class="product-details">
+              <h3 id="productTitle">Produto</h3>
+              <div class="price-info">
+                <span class="price-original" id="priceOriginal"></span>
+                <span class="price-current" id="priceCurrent"></span>
+                <span class="discount-badge" id="discountBadge"></span>
+              </div>
+              <div id="productStore" style="margin-top: 0.5rem; color: var(--text-secondary);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="loader" id="loader"></div>
+
+        <div id="messagesContainer" style="display: none;">
+          <h3 style="color: var(--accent-primary); margin: 2rem 0 1rem;">✉️ Mensagens Geradas</h3>
+          <div id="messagesList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTATÍSTICAS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statSuccess">0</div>
+        <div class="stat-label">Sucesso</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statSaved">0</div>
+        <div class="stat-label">Salvos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statTime">0s</div>
+        <div class="stat-label">Tempo Médio</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <script>
+    // ESTADO GLOBAL
+    let currentProduct = null;
+    let stats = { total: 0, success: 0, saved: 0, totalTime: 0 };
+
+    // UTILITÁRIOS
+    function showNotification(message, type = 'info') {
+      const notification = document.getElementById('notification');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      notification.classList.add('show');
+      setTimeout(() => notification.classList.remove('show'), 3000);
+    }
+
+    function updateStats() {
+      document.getElementById('statTotal').textContent = stats.total;
+      document.getElementById('statSuccess').textContent = stats.success;
+      document.getElementById('statSaved').textContent = stats.saved;
+      document.getElementById('statTime').textContent = stats.total > 0 
+        ? `${(stats.totalTime / stats.total / 1000).toFixed(1)}s` : '0s';
+    }
+
+    function showLoader(show = true) {
+      document.getElementById('loader').style.display = show ? 'block' : 'none';
+    }
+
+    function showStatus(text, show = true) {
+      const statusBar = document.getElementById('statusBar');
+      const statusText = document.getElementById('statusText');
+      statusBar.style.display = show ? 'flex' : 'none';
+      statusText.textContent = text;
+    }
+
+    function sanitizeForJson(text) {
+      return text.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    }
+
+    // ALTERNÂNCIA DE MODOS
+    function switchMode() {
+      const mode = document.getElementById('operationMode').value;
+      console.log('Modo selecionado:', mode); // Debug
+      
+      // Ocultar todos os modos
+      document.querySelectorAll('.operation-mode').forEach(el => {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      });
+      
+      // Mostrar modo selecionado
+      let targetModeId = '';
+      switch(mode) {
+        case 'automatico':
+          targetModeId = 'modeAutomatico';
+          break;
+        case 'semi-manual':
+          targetModeId = 'modeSemiManual';
+          break;
+        case 'json-direto':
+          targetModeId = 'modeJsonDireto';
+          break;
+      }
+      
+      console.log('Procurando elemento:', targetModeId); // Debug
+      const activeMode = document.getElementById(targetModeId);
+      if (activeMode) {
+        activeMode.classList.add('active');
+        activeMode.style.display = 'block';
+        console.log('Modo ativado:', targetModeId); // Debug
+      } else {
+        console.error('Elemento não encontrado:', targetModeId); // Debug
+      }
+      
+      // Mostrar/ocultar configurações
+      const configs = document.getElementById('configurations');
+      if (configs) {
+        configs.style.display = mode === 'json-direto' ? 'none' : 'block';
+      }
+      
+      // Limpar resultados
+      const productPreview = document.getElementById('productPreview');
+      const messagesContainer = document.getElementById('messagesContainer');
+      if (productPreview) productPreview.style.display = 'none';
+      if (messagesContainer) messagesContainer.style.display = 'none';
+      currentProduct = null;
+    }
+
+    // MODO AUTOMÁTICO
+    async function extractFromUrl() {
+      const url = document.getElementById('productUrl').value.trim();
+      if (!url) {
+        showNotification('Insira uma URL válida', 'error');
+        return;
+      }
+
+      showLoader();
+      showStatus('Extraindo dados...');
+      const startTime = Date.now();
+      stats.total++;
+
+      try {
+        const response = await fetch('/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          currentProduct = data.data;
+          stats.success++;
+          stats.totalTime += Date.now() - startTime;
+          
+          displayProduct(currentProduct);
+          generateMessages();
+          showStatus('Extração concluída!');
+          showNotification('Dados extraídos com sucesso!', 'success');
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (error) {
+        showStatus('Erro na extração');
+        showNotification(`Erro: ${error.message}`, 'error');
+      } finally {
+        showLoader(false);
+        updateStats();
+      }
+    }
+
+    // MODO SEMI-MANUAL
+    async function processManualData() {
+      const title = document.getElementById('manualTitle').value.trim();
+      const price = document.getElementById('manualPrice').value.trim();
+      const url = document.getElementById('manualUrl').value.trim();
+      
+      if (!title || !price || !url) {
+        showNotification('Preencha os campos obrigatórios', 'error');
+        return;
+      }
+
+      showLoader();
+      showStatus('Processando dados...');
+      const startTime = Date.now();
+      stats.total++;
+
+      try {
+        const payload = {
+          titulo: title,
+          preco_atual: price,
+          preco_original: document.getElementById('manualOriginalPrice').value.trim(),
+          url_produto: url,
+          url_imagem: document.getElementById('manualImage').value.trim()
+        };
+
+        const response = await fetch('/semi-auto/manual-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          currentProduct = data.data;
+          stats.success++;
+          stats.totalTime += Date.now() - startTime;
+          
+          displayProduct(currentProduct);
+          generateMessages();
+          showStatus('Dados processados!');
+          showNotification('Produto criado com sucesso!', 'success');
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (error) {
+        showStatus('Erro no processamento');
+        showNotification(`Erro: ${error.message}`, 'error');
+      } finally {
+        showLoader(false);
+        updateStats();
+      }
+    }
+
+    // MODO JSON DIRETO
+    async function saveDirectly() {
+      const message = document.getElementById('jsonMessage').value.trim();
+      if (!message) {
+        showNotification('Insira a mensagem', 'error');
+        return;
+      }
+
+      showLoader();
+      showStatus('Salvando mensagem...');
+      stats.total++;
+
+      try {
+        const payload = {
+          mensagem: message,
+          url_imagem: document.getElementById('jsonImage').value.trim()
+        };
+
+        const response = await fetch('/semi-auto/json-direct', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          stats.success++;
+          stats.saved++;
+          
+          showStatus('Salvo no Supabase!');
+          showNotification('Mensagem salva com sucesso!', 'success');
+          
+          // Mostrar mensagem de sucesso
+          const successDiv = document.createElement('div');
+          successDiv.className = 'success-message';
+          successDiv.textContent = '✅ Mensagem enviada diretamente para o Supabase!';
+          document.getElementById('statusBar').insertAdjacentElement('afterend', successDiv);
+          
+          setTimeout(() => successDiv.remove(), 5000);
+          
+          // Limpar campos
+          document.getElementById('jsonMessage').value = '';
+          document.getElementById('jsonImage').value = '';
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (error) {
+        showStatus('Erro ao salvar');
+        showNotification(`Erro: ${error.message}`, 'error');
+      } finally {
+        showLoader(false);
+        updateStats();
+      }
+    }
+
+    // EXIBIR PRODUTO
+    function displayProduct(product) {
+      const preview = document.getElementById('productPreview');
+      preview.style.display = 'block';
+
+      // Imagem
+      const img = document.getElementById('productImage');
+      if (product.fields.image_url?.value) {
+        img.src = product.fields.image_url.value;
+        img.onerror = () => img.src = 'https://via.placeholder.com/150?text=Sem+Imagem';
+      } else {
+        img.src = 'https://via.placeholder.com/150?text=Sem+Imagem';
+      }
+
+      // Título
+      document.getElementById('productTitle').textContent = 
+        product.fields.title?.value || 'Produto';
+
+      // Preços
+      const priceOriginal = document.getElementById('priceOriginal');
+      const priceCurrent = document.getElementById('priceCurrent');
+      const discountBadge = document.getElementById('discountBadge');
+
+      if (product.fields.price_original?.value) {
+        priceOriginal.textContent = product.fields.price_original.value;
+        priceOriginal.style.display = 'inline';
+      } else {
+        priceOriginal.style.display = 'none';
+      }
+
+      priceCurrent.textContent = product.fields.price_current?.value || 'Preço não disponível';
+
+      if (product.fields.discount_percentage?.value) {
+        discountBadge.textContent = product.fields.discount_percentage.value;
+        discountBadge.style.display = 'inline';
+      } else {
+        discountBadge.style.display = 'none';
+      }
+
+      // Loja
+      document.getElementById('productStore').textContent = 
+        `🏪 ${product.site_name || 'Manual'}`;
+    }
+
+    // GERAR MENSAGENS
+    function generateMessages() {
+      if (!currentProduct) return;
+
+      const container = document.getElementById('messagesContainer');
+      const messagesList = document.getElementById('messagesList');
+      
+      container.style.display = 'block';
+      messagesList.innerHTML = '';
+
+      const category = document.getElementById('category').value;
+      const messageType = document.getElementById('messageType').value;
+      
+      const messages = createMessages(currentProduct, category, messageType);
+
+      messages.forEach((message, index) => {
+        const messageDiv = createMessageElement(message, index);
+        messagesList.appendChild(messageDiv);
+      });
+    }
+
+    // CRIAR MENSAGENS
+    function createMessages(product, category, messageType) {
+      const title = product.fields.title?.value || 'Produto';
+      const priceOriginal = product.fields.price_original?.value;
+      const priceCurrent = product.fields.price_current?.value;
+      const discount = product.fields.discount_percentage?.value;
+      const url = product.url;
+      const rating = product.fields.rating?.value;
+      const ratingCount = product.fields.rating?.count;
+
+      // Configurações de frete
+      const includeFrete = document.getElementById('toggleFrete').classList.contains('active');
+      const freteMinimo = document.getElementById('freteMinimo').value;
+      const freteCondicao = document.getElementById('freteCondicao').value;
+      
+      // Configurações de cupom
+      const includeCupom = document.getElementById('toggleCupom').classList.contains('active');
+      const cupomCodigo = document.getElementById('cupomCodigo').value || 'PROMO10';
+      const cupomValor = document.getElementById('cupomValor').value || '10';
+      const cupomTipo = document.getElementById('cupomTipo').value;
+
+      // Configurações de avaliação
+      const includeRatings = document.getElementById('toggleRatings').classList.contains('active');
+
+      // Texto de frete
+      let freteTexto = '';
+      if (includeFrete) {
+        switch(freteCondicao) {
+          case 'geral':
+            freteTexto = '\\n🚚 FRETE GRÁTIS';
+            break;
+          case 'minimo':
+            freteTexto = `\\n🚚 FRETE GRÁTIS acima de ${freteMinimo || 'R$ 79,90'}`;
+            break;
+          case 'prime':
+            freteTexto = '\\n🚚 FRETE GRÁTIS com Prime/Full';
+            break;
+          case 'regiao':
+            freteTexto = '\\n🚚 FRETE GRÁTIS para sua região';
+            break;
+        }
+      }
+
+      // Texto de cupom
+      let cupomTexto = '';
+      if (includeCupom && cupomCodigo) {
+        const simbolo = cupomTipo === 'porcentagem' ? '%' : 'R';
+        cupomTexto = `\\n🎟️ USE O CUPOM: ${cupomCodigo.toUpperCase()} (${simbolo}${cupomValor} OFF)`;
+      }
+
+      // Texto de avaliação
+      let avaliacaoTexto = '';
+      if (includeRatings && rating) {
+        avaliacaoTexto = `\\n⭐ ${rating}/5 (${ratingCount || '0'} avaliações)`;
+      }
+
+      const emojis = {
+        tecnologia: '💻', casa: '🏠', saude: '💪', moda: '👗', esporte: '⚽'
+      };
+
+      const templates = {
+        impacto: [
+          `🔥 OFERTA IMPERDÍVEL! ${emojis[category]}\\n${title}${avaliacaoTexto}\\n${priceOriginal ? `💸 De ${priceOriginal} por ${priceCurrent}` : `💰 Por apenas ${priceCurrent}`}${discount ? ` (${discount} OFF)` : ''}${freteTexto}${cupomTexto}\\n🚀 Garanta já o seu!\\n🔗 ${url}\\n\\n📱 Grupo VIP: https://chat.whatsapp.com/JelwkQXy1Mj05NWybBCTQX`,
+          `⚡ SUPER PROMOÇÃO ${emojis[category]}\\n${title}${avaliacaoTexto}\\n${discount ? `🎯 ${discount} DE DESCONTO!` : '🎯 PREÇO ESPECIAL!'}\\n💰 Apenas ${priceCurrent}${freteTexto}${cupomTexto}\\n✨ Oferta por tempo limitado\\n🔗 ${url}\\n\\n📱 Mais ofertas: https://chat.whatsapp.com/JelwkQXy1Mj05NWybBCTQX`
+        ],
+        urgencia: [
+          `⏰ ÚLTIMAS HORAS! ${emojis[category]}\\n${title}${avaliacaoTexto}\\n${priceOriginal ? `❌ ${priceOriginal}` : ''}\\n✅ ${priceCurrent}${discount ? ` (-${discount})` : ''}${freteTexto}${cupomTexto}\\n🏃‍♂️ Corre que ainda dá tempo!\\n🔗 ${url}\\n\\n📱 Grupo exclusivo: https://chat.whatsapp.com/JelwkQXy1Mj05NWybBCTQX`,
+          `🚨 ATENÇÃO! Oferta relâmpago ${emojis[category]}\\n${title}${avaliacaoTexto}\\n${discount ? `💥 ${discount} OFF SOMENTE HOJE!` : '💥 PROMOÇÃO ESPECIAL!'}\\n💵 ${priceCurrent}${freteTexto}${cupomTexto}\\n⚡ Estoque limitado!\\n🔗 ${url}\\n\\n📱 Não perca: https://chat.whatsapp.com/JelwkQXy1Mj05NWybBCTQX`
+        ],
+        beneficio: [
+          `✨ ${title} ${emojis[category]}${avaliacaoTexto}\\n💰 ${priceOriginal && priceCurrent ? `Economia de ${priceOriginal} para ${priceCurrent}` : priceCurrent}${freteTexto}${cupomTexto}\\n✅ Qualidade garantida\\n✅ Entrega rápida\\n✅ Compra segura\\n🔗 ${url}\\n\\n📱 Ofertas diárias: https://chat.whatsapp.com/JelwkQXy1Mj05NWybBCTQX`,
+          `🎁 Presenteie com economia! ${emojis[category]}\\n${title}${avaliacaoTexto}\\n${discount ? `🏷️ ${discount} de desconto` : '🏷️ Oferta especial'}\\n💳 ${priceCurrent} (parcele sem juros!)${freteTexto}${cupomTexto}\\n🚚 Entrega garantida\\n🔗 ${url}\\n\\n📱 Grupo VIP: https://chat.whatsapp.com/JelwkQXy1Mj05NWybBCTQX`
+        ],
+        escassez: [
+          `🚨 ÚLTIMAS UNIDADES! ${emojis[category]}\\n${title}${avaliacaoTexto}\\n${priceOriginal && discount ? `🔥 ${discount} OFF - De ${priceOriginal} por ${priceCurrent}` : `💰 ${priceCurrent}`}${freteTexto}${cupomTexto}\\n⚠️ Quase esgotado!\\n🛒 Compre antes que acabe\\n🔗 ${url}\\n\\n📱 Fique por dentro: https://chat.whatsapp.com/JelwkQXy1Mj05NWybBCTQX`,
+          `🔴 ESTOQUE LIMITADO! ${emojis[category]}\\n${title}${avaliacaoTexto}\\n${discount ? `💣 DESCONTO DE ${discount}` : '💣 OFERTA EXCLUSIVA'}\\n💵 Apenas ${priceCurrent}${freteTexto}${cupomTexto}\\n📦 Poucas unidades restantes\\n🔗 ${url}\\n\\n📱 Grupo de ofertas: https://chat.whatsapp.com/JelwkQXy1Mj05NWybBCTQX`
+        ]
+      };
+
+      return templates[messageType] || templates.impacto;
+    }
+
+    // CRIAR ELEMENTO DE MENSAGEM
+    function createMessageElement(message, index) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message-container';
+
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'message-actions';
+
+      // Botão Editar
+      const btnEdit = document.createElement('button');
+      btnEdit.className = 'btn-small btn-edit';
+      btnEdit.innerHTML = '✏️ Editar';
+      btnEdit.onclick = () => toggleEditMode(messageDiv, btnEdit);
+
+      // Botão Copiar
+      const btnCopy = document.createElement('button');
+      btnCopy.className = 'btn-small btn-copy';
+      btnCopy.innerHTML = '📋 Copiar';
+      btnCopy.onclick = () => {
+        const textarea = messageDiv.querySelector('.message-text');
+        const textToCopy = textarea.value;
+        navigator.clipboard.writeText(textToCopy);
+        showNotification('Mensagem copiada!', 'success');
+      };
+
+      // Botão Salvar
+      const btnSave = document.createElement('button');
+      btnSave.className = 'btn-small btn-save';
+      btnSave.innerHTML = '🚀 Enviar';
+      btnSave.onclick = async () => {
+        btnSave.disabled = true;
+        btnSave.innerHTML = '⏳ Enviando...';
+        
+        try {
+          const textarea = messageDiv.querySelector('.message-text');
+          await saveToSupabase(textarea.value);
+          btnSave.innerHTML = '✅ Enviado!';
+          btnSave.style.background = '#00ff88';
+          
+          setTimeout(() => {
+            btnSave.innerHTML = '🚀 Enviar';
+            btnSave.style.background = '';
+            btnSave.disabled = false;
+          }, 2000);
+        } catch (error) {
+          btnSave.innerHTML = '❌ Erro';
+          btnSave.style.background = '#ff6b6b';
+          
+          setTimeout(() => {
+            btnSave.innerHTML = '🚀 Enviar';
+            btnSave.style.background = '';
+            btnSave.disabled = false;
+          }, 2000);
+        }
+      };
+
+      actionsDiv.appendChild(btnEdit);
+      actionsDiv.appendChild(btnCopy);
+      actionsDiv.appendChild(btnSave);
+
+      // Textarea
+      const textarea = document.createElement('textarea');
+      textarea.className = 'message-text';
+      textarea.value = message.replace(/\\n/g, '\n');
+      textarea.setAttribute('readonly', true);
+
+      messageDiv.appendChild(actionsDiv);
+      messageDiv.appendChild(textarea);
+
+      return messageDiv;
+    }
+
+    // ALTERNAR MODO DE EDIÇÃO
+    function toggleEditMode(messageDiv, btnEdit) {
+      const textarea = messageDiv.querySelector('.message-text');
+      const isEditing = !textarea.hasAttribute('readonly');
+      
+      if (isEditing) {
+        // Sair do modo de edição
+        textarea.setAttribute('readonly', true);
+        textarea.style.borderColor = 'var(--border)';
+        textarea.style.backgroundColor = 'var(--bg-tertiary)';
+        btnEdit.innerHTML = '✏️ Editar';
+        btnEdit.style.background = '';
+        showNotification('Edição salva!', 'success');
+      } else {
+        // Entrar no modo de edição
+        textarea.removeAttribute('readonly');
+        textarea.style.borderColor = 'var(--accent-warning)';
+        textarea.style.backgroundColor = '#2a2a2a';
+        textarea.focus();
+        btnEdit.innerHTML = '💾 Salvar';
+        btnEdit.style.background = 'var(--accent-warning)';
+        btnEdit.style.color = 'var(--bg-primary)';
+        showNotification('Modo de edição ativado!', 'info');
+      }
+    }
+
+    // SALVAR NO SUPABASE
+    async function saveToSupabase(messageText) {
+      const imageUrl = currentProduct?.fields?.image_url?.value || '';
+      const sanitizedMessage = messageText.replace(/\\n/g, '\n');
+
+      const response = await fetch('/supabase/save-promotion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mensagem: sanitizedMessage,
+          imagem_url: imageUrl
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        stats.saved++;
+        updateStats();
+        showNotification('Enviado para Supabase!', 'success');
+      } else {
+        throw new Error(result.error || 'Erro ao salvar');
+      }
+    }
+
+    // DETECTAR SITE PELA URL
+    document.getElementById('productUrl').addEventListener('input', function(e) {
+      const url = e.target.value;
+      const status = document.getElementById('urlStatus');
+      
+      if (!url) {
+        status.textContent = '';
+        return;
+      }
+
+      let icon = '❓';
+      if (url.includes('mercadolivre.com')) icon = '🛒';
+      else if (url.includes('amazon.com')) icon = '📦';
+      else if (url.includes('magazineluiza.com')) icon = '🏪';
+      else if (url.includes('shopee.com')) icon = '🛍️';
+      
+      status.textContent = icon;
+    });
+
+    // EVENT LISTENERS PARA REGENERAR MENSAGENS
+    document.getElementById('category').addEventListener('change', () => {
+      if (currentProduct) generateMessages();
+    });
+    
+    document.getElementById('messageType').addEventListener('change', () => {
+      if (currentProduct) generateMessages();
+    });
+
+    // EVENT LISTENERS PARA TOGGLES
+    document.querySelectorAll('.toggle-switch').forEach(toggle => {
+      toggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        
+        if (this.id === 'toggleFrete') {
+          document.getElementById('freteConfig').style.display = 
+            this.classList.contains('active') ? 'block' : 'none';
+        } else if (this.id === 'toggleCupom') {
+          document.getElementById('cupomConfig').style.display = 
+            this.classList.contains('active') ? 'block' : 'none';
+        }
+        
+        // Regenerar mensagens se necessário
+        if (currentProduct) generateMessages();
+      });
+    });
+
+    // EVENT LISTENERS PARA CONFIGURAÇÕES DE FRETE E CUPOM
+    document.getElementById('freteMinimo').addEventListener('input', () => {
+      if (currentProduct) generateMessages();
+    });
+    
+    document.getElementById('freteCondicao').addEventListener('change', () => {
+      if (currentProduct) generateMessages();
+    });
+    
+    document.getElementById('cupomCodigo').addEventListener('input', () => {
+      if (currentProduct) generateMessages();
+    });
+    
+    document.getElementById('cupomValor').addEventListener('input', () => {
+      if (currentProduct) generateMessages();
+    });
+    
+    document.getElementById('cupomTipo').addEventListener('change', () => {
+      if (currentProduct) generateMessages();
+    });
+
+    // INICIALIZAÇÃO
+    function initializeApp() {
+      console.log('Inicializando aplicação...');
+      
+      // Verificar se todos os elementos existem
+      const requiredElements = [
+        'operationMode', 'modeAutomatico', 'modeSemiManual', 'modeJsonDireto',
+        'configurations', 'productPreview', 'messagesContainer'
+      ];
+      
+      requiredElements.forEach(id => {
+        const element = document.getElementById(id);
+        console.log(`Elemento ${id}:`, element ? 'Encontrado' : 'NÃO ENCONTRADO');
+      });
+      
+      updateStats();
+      switchMode(); // Inicializar com modo padrão
+      showStatus('Sistema carregado e pronto!');
+    }
+
+    // Aguardar DOM estar completamente carregado
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+      initializeApp();
+    }
+
+    console.log('🚀 ProScraper Pro v8.1 - Sistema Semi-Automático Carregado!');
+  </script>
+</body>
+</html>
